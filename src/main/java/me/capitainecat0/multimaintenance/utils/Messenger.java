@@ -1,7 +1,14 @@
 package me.capitainecat0.multimaintenance.utils;
 
+import de.leonhard.storage.Yaml;
 import me.capitainecat0.multimaintenance.MultiMaintenance;
 
+import java.io.File;
+import java.util.Locale;
+
+/**
+ * Enum that will handle messages and language files.
+ */
 public enum Messenger {
 
     ALLOWED_ALREADY_ADDED(MultiMaintenance.colored("&e%p &cest déja dans la whitelist!")),
@@ -35,16 +42,36 @@ public enum Messenger {
     MAINTENANCE_SCHEDULED_CANCELLED_BROADCAST(MultiMaintenance.colored("&7&lLa maintenance du serveur a été &c&lannulée&7&l!")),
     MAINTENANCE_SCHEDULED_END_BROADCAST_MESSAGE(MultiMaintenance.colored("&5&lHall&d&lOf&5&lGames &8&l> &e&lLe serveur sort du mode maintenance dans&c&l %s &e&l!")),
     MAINTENANCE_SUCCESSFULLY_ENABLED_DURATION(MultiMaintenance.colored("&7La maintenance a été &aactivée&7 avec succès !\n&aDurée de la maintenance :&e %s &asecondes.")),
-    MAINTENANCE_SUCCESSFULLY_SCHEDULED(MultiMaintenance.colored("&7La maintenance a été planifiée avec &asuccès&7 !\n&aActivation dans&e %s &asecondes !"));
+    MAINTENANCE_SUCCESSFULLY_SCHEDULED(MultiMaintenance.colored("&7La maintenance a été planifiée avec &asuccès&7 !\n&aActivation dans&e %s &asecondes !")),
 
+    ;
 
-    public final String msg;
+    private final String defaultValue;
+    private final String key;
 
-    Messenger(String msg) {
-        this.msg = msg;
+    /**
+     * New instance of a {@link Messenger}.
+     * <br> Use {@link Messenger#getMessage()} to get the formatted message.
+     * @param defaultValue The default value if not present in the <code>lang.yml</code> file.
+     */
+    Messenger(String defaultValue) {
+        this.defaultValue = defaultValue;
+        this.key = name().replaceAll("_", ".").toLowerCase(Locale.ROOT);
+    }
+
+    private static Yaml getLangFile() {
+        return new Yaml(new File(MultiMaintenance.getInstance().getDataFolder(), "lang.yml"));
     }
 
     public String getMessage() {
-        return msg;
+        return getLangFile().getOrSetDefault(key, defaultValue);
+    }
+
+    String getDefaultValue() {
+        return defaultValue;
+    }
+
+    String getKey() {
+        return key;
     }
 }
